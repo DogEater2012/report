@@ -1,0 +1,3 @@
+/Users/firenabang2012/Downloads/Cykor_week1/cmake-build-debug/CMakeFiles/Cykor_week1.dir
+/Users/firenabang2012/Downloads/Cykor_week1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/firenabang2012/Downloads/Cykor_week1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
