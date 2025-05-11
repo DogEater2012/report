@@ -39,12 +39,13 @@ char    stack_info[STACK_SIZE][20];     // Call Stack 요소에 대한 설명을
 int SP = -1; 
 int FP = -1;
 int ret = -1;
+int garbage = 0; //pop한 값을 사용하지 않을 때 garbage에다가 저장
 
 void func1(int arg1, int arg2, int arg3);
 void func2(int arg1, int arg2);
 void func3(int arg1);
 void push(int a);
-void pop();
+void pop(int *a);
 
 
 void push(int a){
@@ -52,8 +53,8 @@ void push(int a){
     call_stack[SP] = a;
 }
 
-void pop(){
-    call_stack[SP] = 0;
+void pop(int *a){
+    *a = call_stack[SP];
     SP--;
 }
 
@@ -102,13 +103,20 @@ void func1(int arg1, int arg2, int arg3)
     push(-1); strcpy(stack_info[SP],"Return Address");
     push(FP); strcpy(stack_info[SP],"func1's SFP");
     FP = SP;
-    push(var_1); strcpy(stack_info[SP],"var_1");
+    SP++;//지역변수 공간 할당
+    call_stack[SP] = var_1; strcpy(stack_info[SP],"var_1");
 
 
 
     print_stack();
     func2(11, 13);
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
+    SP = FP;
+    pop(&FP);
+    pop(&garbage); //return address 및 매개변수 제거
+    pop(&garbage);
+    pop(&garbage);
+
     print_stack();
 
 }
@@ -125,11 +133,18 @@ void func2(int arg1, int arg2)
     push(-1); strcpy(stack_info[SP],"Return Address");
     push(FP); strcpy(stack_info[SP],"func2's SFP");
     FP = SP;
-    push(var_2); strcpy(stack_info[SP],"var_2");
+    SP++;//지역변수 공간 할당
+    call_stack[SP] = var_2; strcpy(stack_info[SP],"var_2");
     print_stack();
     func3(77);
     // func3의 스택 프레임 제거 (함수 에필로그 + pop)
+    SP = FP;
+    pop(&FP);
+    pop(&garbage); //return address 및 매개변수 제거
+    pop(&garbage);
+
     print_stack();
+
 }
 
 void func3(int arg1)
@@ -139,11 +154,14 @@ void func3(int arg1)
 
     // func3의 스택 프레임 형성 (함수 프롤로그 + push)
     push(arg1); strcpy(stack_info[SP],"arg1");
+
     push(-1); strcpy(stack_info[SP],"Return Address");
     push(FP); strcpy(stack_info[SP],"func3's SFP");
     FP = SP;
-    push(var_3); strcpy(stack_info[SP],"var_3");
-    push(var_4); strcpy(stack_info[SP],"var_4");
+    SP+=2; //지역변수 공간 할당
+    call_stack[SP] = var_4; strcpy(stack_info[SP],"var_4");
+    call_stack[SP -1] = var_3; strcpy(stack_info[SP -1],"var_3");
+
     print_stack();
 }
 
@@ -153,6 +171,14 @@ int main()
 {
     func1(1, 2, 3);
     // func1의 스택 프레임 제거 (함수 에필로그 + pop)
+
+    SP = FP;
+    pop(&FP);
+    pop(&garbage); //return address 및 매개변수 제거
+    pop(&garbage);
+    pop(&garbage);
+    pop(&garbage);
+
     print_stack();
     return 0;
 }
